@@ -1,8 +1,8 @@
 import telebot
+import json
 from telebot import types
 from bot_token import TOKEN
 from User import User
-
 
 bot = telebot.TeleBot(TOKEN)
 
@@ -26,11 +26,12 @@ def process_name_step(message):
     try:
         chat_id = message.chat.id
         user_dict[chat_id] = User(message.text)
-
+        user_dict[chat_id].id = chat_id
         msg = bot.send_message(chat_id, 'Сколько вам полных лет?')
         bot.register_next_step_handler(msg, process_age_step)
 
     except Exception as e:
+        print(e)
         bot.reply_to(message, 'ooops!!')
 
 
@@ -80,8 +81,7 @@ def process_experience(message):
         user.experience = message.text
 
         user_dict[chat_id] = user.__dict__
-        print(user_dict)
-
+        user.save()
     except Exception as e:
         bot.reply_to(message, 'ooops!!')
 
