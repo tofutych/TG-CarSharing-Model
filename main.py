@@ -11,6 +11,16 @@ bot = telebot.TeleBot(TOKEN)
 user_dict = {}
 
 
+def main_menu_kb():
+    kb = types.InlineKeyboardMarkup(row_width=1)
+    kb.add(types.InlineKeyboardButton(
+        text='Информация о профиле', callback_data='profile'))
+    kb.add(types.InlineKeyboardButton(
+        text='Машины на карте', callback_data='cars'))
+
+    return kb
+
+
 def gender_kb():
     kb = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=4)
     buttons = []
@@ -35,7 +45,8 @@ def process_name_step(message):
         chat_id = message.chat.id
         user_dict[chat_id] = User(message.text)
         user_dict[chat_id].id = chat_id
-        msg = bot.send_message(chat_id, 'Выберите пол\nЕсли его здесь нет, то напишите самостоятельно', reply_markup=gender_kb())
+        msg = bot.send_message(
+            chat_id, 'Выберите пол\nЕсли его здесь нет, то напишите самостоятельно', reply_markup=gender_kb())
         bot.register_next_step_handler(msg, process_sex_step)
     except Exception as e:
         bot.reply_to(message, 'ooops!!')
@@ -47,7 +58,8 @@ def process_sex_step(message):
         user = user_dict[chat_id]
         Gender(message.text)
         user.sex = message.text
-        msg = bot.send_message(chat_id, 'Сколько вам полных лет?', reply_markup=types.ReplyKeyboardRemove(selective=False))
+        msg = bot.send_message(chat_id, 'Сколько вам полных лет?',
+                               reply_markup=types.ReplyKeyboardRemove(selective=False))
         bot.register_next_step_handler(msg, process_age_step)
     except Exception as e:
         bot.reply_to(message, 'ooops!!')
@@ -97,11 +109,20 @@ def process_experience(message):
         chat_id = message.chat.id
         user = user_dict[chat_id]
         user.experience = message.text
-
-        user_dict[chat_id] = user.__dict__
         user.save()
+
+        bot.reply_to(message, 'Регистрация звершена!')
+        bot.send_message(chat_id, 'Меню', reply_markup=main_menu_kb())
     except Exception as e:
         bot.reply_to(message, 'ooops!!')
+
+
+@bot.callback_query_handler(func=lambda call: True)
+def callback_inline(call):
+    if call.data == "profile":
+        bot.answer_callback_query(call.id, 'Info')
+    elif call.data == "cars":
+        bot.answer_callback_query(call.id, 'Cars')
 
 
 bot.enable_save_next_step_handlers(delay=2)
