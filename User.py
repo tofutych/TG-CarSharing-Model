@@ -6,7 +6,6 @@ from os import chdir, getcwd
 
 class User(object):
     def __init__(self, name):
-        self.__isadmin = False
         self.name = name
         self.tariff = 1
 
