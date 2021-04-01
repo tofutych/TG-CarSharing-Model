@@ -6,5 +6,5 @@ class Gender(object):
             Gender.genders.append(gender)
 
     @classmethod
-    def get_genders(cls):
+    def all(cls):
         return Gender.genders
