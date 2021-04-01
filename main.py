@@ -2,24 +2,32 @@ import telebot
 import json
 from telebot import types
 from bot_token import TOKEN
+from Gender import Gender
 from User import User
+from os import listdir
 
 bot = telebot.TeleBot(TOKEN)
 
 user_dict = {}
 
 
+def gender_kb():
+    kb = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=4)
+    buttons = []
+    for gender in Gender.all():
+        buttons.append(types.KeyboardButton(gender.title()))
+    kb.add(*buttons)
+    return kb
+
+
 @bot.message_handler(commands=["start"])
 def start(message):
-    msg = bot.reply_to(
-        message, f"Привет, {message.chat.first_name}!\nКак тебя зовут?")
-    bot.register_next_step_handler(msg, process_name_step)
-
-
-@bot.message_handler(commands=["reg"])
-def user_reg(message):
-    msg = bot.send_message(message.chat.id, 'Как вас зовут?')
-    bot.register_next_step_handler(msg, process_name_step)
+    if f'{message.chat.id}.json' not in listdir('./users'):
+        msg = bot.reply_to(
+            message, f"Привет, {message.chat.first_name}!\nКак тебя зовут?")
+        bot.register_next_step_handler(msg, process_name_step)
+    else:
+        print('on tut')
 
 
 def process_name_step(message):
@@ -27,11 +35,21 @@ def process_name_step(message):
         chat_id = message.chat.id
         user_dict[chat_id] = User(message.text)
         user_dict[chat_id].id = chat_id
-        msg = bot.send_message(chat_id, 'Сколько вам полных лет?')
-        bot.register_next_step_handler(msg, process_age_step)
-
+        msg = bot.send_message(chat_id, 'Выберите пол\nЕсли его здесь нет, то напишите самостоятельно', reply_markup=gender_kb())
+        bot.register_next_step_handler(msg, process_sex_step)
     except Exception as e:
-        print(e)
+        bot.reply_to(message, 'ooops!!')
+
+
+def process_sex_step(message):
+    try:
+        chat_id = message.chat.id
+        user = user_dict[chat_id]
+        Gender(message.text)
+        user.sex = message.text
+        msg = bot.send_message(chat_id, 'Сколько вам полных лет?', reply_markup=types.ReplyKeyboardRemove(selective=False))
+        bot.register_next_step_handler(msg, process_age_step)
+    except Exception as e:
         bot.reply_to(message, 'ooops!!')
 
 
