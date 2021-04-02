@@ -46,7 +46,7 @@ def process_name_step(message):
         user_dict[chat_id] = User(message.text)
         user_dict[chat_id].id = chat_id
         msg = bot.send_message(
-            chat_id, 'Введите вашу фамилию', reply_markup=gender_kb())
+            chat_id, 'Введите вашу фамилию')
         bot.register_next_step_handler(msg, process_surname_step)
     except Exception as e:
         bot.reply_to(message, 'ooops!!')
