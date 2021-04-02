@@ -5,6 +5,7 @@ from bot_token import TOKEN
 from Gender import Gender
 from User import User
 from os import listdir
+from time import sleep
 
 bot = telebot.TeleBot(TOKEN)
 
@@ -51,6 +52,7 @@ def process_name_step(message):
         chat_id = message.chat.id
         user_dict[chat_id] = User(message.text)
         user_dict[chat_id].id = chat_id
+
         msg = bot.send_message(chat_id, "Введите вашу фамилию")
         bot.register_next_step_handler(msg, process_surname_step)
     except Exception as e:
@@ -78,6 +80,7 @@ def process_gender_step(message):
         user = user_dict[chat_id]
         Gender(message.text)
         user.gender = message.text
+
         msg = bot.send_message(
             chat_id,
             "Введите дату рождения в формате ДД.ММ.ГГГГ",
@@ -96,7 +99,6 @@ def process_bdate_step(message):
 
         msg = bot.send_message(chat_id, "Ваш номер телефона")
         bot.register_next_step_handler(msg, process_phone_step)
-
     except Exception as e:
         bot.reply_to(message, "ooops!!")
 
@@ -109,7 +111,6 @@ def process_phone_step(message):
 
         msg = bot.send_message(chat_id, "Номер водительского удостоверения")
         bot.register_next_step_handler(msg, process_license_number)
-
     except Exception as e:
         bot.reply_to(message, "ooops!!")
 
@@ -157,12 +158,10 @@ def callback_inline(call):
             reply_markup=back_kb(),
         )
     elif call.data == "cars":
-        bot.edit_message_text(
-            chat_id=call.message.chat.id,
-            message_id=call.message.message_id,
-            text='молния маккуууиин',
-            reply_markup=back_kb(),
-        )
+        photo = open("kchau.jpg", "rb")
+        bot.send_photo(call.message.chat.id, photo)
+        sleep(1)
+        bot.delete_message(call.message.chat.id, call.message.message_id + 1)
 
 
 bot.enable_save_next_step_handlers(delay=2)
