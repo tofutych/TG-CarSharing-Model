@@ -1,5 +1,5 @@
 class Gender(object):
-    genders = ['male', 'female']
+    genders = ["male", "female"]
 
     def __init__(self, gender):
         if gender.lower() not in Gender.genders:
