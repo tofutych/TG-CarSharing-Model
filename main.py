@@ -38,13 +38,17 @@ def gender_kb():
 
 @bot.message_handler(commands=["start"])
 def start(message):
-    if f"{message.chat.id}.json" not in listdir("./users"):
+    # if f"{message.chat.id}.json" not in listdir("./users"):
+    #     msg = bot.reply_to(
+    #         message, f"Привет, {message.chat.first_name}!\nВведите ваше имя"
+    #     )
+    #     bot.register_next_step_handler(msg, process_name_step)
+    # else:
+    #     print("on tut")
+
         msg = bot.reply_to(
             message, f"Привет, {message.chat.first_name}!\nВведите ваше имя"
         )
-        bot.register_next_step_handler(msg, process_name_step)
-    else:
-        print("on tut")
 
 
 def process_name_step(message):
