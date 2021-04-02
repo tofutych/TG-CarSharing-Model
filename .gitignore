@@ -1,5 +1,6 @@
 bot_token.py
 users
+.handler-saves
 .DS_Store
 .huskyrc.json
 out
