@@ -34,7 +34,7 @@ def gender_kb():
 def start(message):
     if f'{message.chat.id}.json' not in listdir('./users'):
         msg = bot.reply_to(
-            message, f"Привет, {message.chat.first_name}!\nКак тебя зовут?")
+            message, f"Привет, {message.chat.first_name}!\nВведите ваше имя")
         bot.register_next_step_handler(msg, process_name_step)
     else:
         print('on tut')
@@ -46,26 +46,38 @@ def process_name_step(message):
         user_dict[chat_id] = User(message.text)
         user_dict[chat_id].id = chat_id
         msg = bot.send_message(
-            chat_id, 'Выберите пол\nЕсли его здесь нет, то напишите самостоятельно', reply_markup=gender_kb())
-        bot.register_next_step_handler(msg, process_sex_step)
+            chat_id, 'Введите вашу фамилию', reply_markup=gender_kb())
+        bot.register_next_step_handler(msg, process_surname_step)
     except Exception as e:
         bot.reply_to(message, 'ooops!!')
 
 
-def process_sex_step(message):
+def process_surname_step(message):
+    try:
+        chat_id = message.chat.id
+        user = user_dict[chat_id]
+        user.surname = message.text
+        msg = bot.send_message(
+            chat_id, 'Выберите гендер\nЕсли его здесь нет, то напишите самостоятельно', reply_markup=gender_kb())
+        bot.register_next_step_handler(msg, process_gender_step)
+    except Exception as e:
+        bot.reply_to(message, 'ooops!!')
+
+
+def process_gender_step(message):
     try:
         chat_id = message.chat.id
         user = user_dict[chat_id]
         Gender(message.text)
-        user.sex = message.text
-        msg = bot.send_message(chat_id, 'Сколько вам полных лет?',
+        user.gender = message.text
+        msg = bot.send_message(chat_id, 'Введите дату рождения в формате ДД.ММ.ГГГГ',
                                reply_markup=types.ReplyKeyboardRemove(selective=False))
-        bot.register_next_step_handler(msg, process_age_step)
+        bot.register_next_step_handler(msg, process_bdate_step)
     except Exception as e:
         bot.reply_to(message, 'ooops!!')
 
 
-def process_age_step(message):
+def process_bdate_step(message):
     try:
         chat_id = message.chat.id
         user = user_dict[chat_id]
