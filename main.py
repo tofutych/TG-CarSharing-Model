@@ -1,11 +1,13 @@
-import telebot
 import json
+from os import listdir
+from time import sleep
+
+import telebot
 from telebot import types
+
 from bot_token import TOKEN
 from Gender import Gender
 from User import User
-from os import listdir
-from time import sleep
 
 bot = telebot.TeleBot(TOKEN)
 
